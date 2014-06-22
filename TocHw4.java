@@ -53,9 +53,10 @@ public class TocHw4{
 		public static  String GetRoadName(String Input)
 		{
 				int i;
-				for(i=0;i<Input.length();i++)
-						if(Input.charAt(i)=='路'||Input.charAt(i)=='街'||Input.charAt(i)=='巷')
+				for(i=1;i<Input.length();i++)
+						if((Input.charAt(i)=='路'||Input.charAt(i)=='街'||Input.charAt(i)=='巷'||(Input.charAt(i-1)=='大'&&Input.charAt(i)=='道'))&&i>3)
 						{
+								
 								return Input.substring(0,i+1);
 						}
 				return null;
@@ -84,9 +85,10 @@ public class TocHw4{
 						{
 								JSONObject j = rootobj.getJSONObject(i);
 								String jloc = j.getString("土地區段位置或建物區門牌");
-								if(jloc.contains("路")||jloc.contains("街")||jloc.contains("巷"))
 								{
 										String jRoad = GetRoadName(jloc);
+										if(jRoad==null)
+											continue;
 										int price = j.getInt("總價元");
 										int month = j.getInt("交易年月");
 										Info tmp;
@@ -104,43 +106,33 @@ public class TocHw4{
 										}
 
 								}
-								else
-								{
-										continue;
-								}
 						}
 						for(int i = 0;i< rootobj.length();i++)
 						{
 								JSONObject j = rootobj.getJSONObject(i);
 								String jloc = j.getString("土地區段位置或建物區門牌");
-								if(jloc.contains("路")||jloc.contains("街")||jloc.contains("巷"))
-								{
-										String jRoad = GetRoadName(jloc);
-
-										Info tmp = info.get(jRoad);
-										if(tmp.months>max_distinct_month)
-										{
-												maxM.clear();
-												maxM.add(jRoad);
-												in.put(jRoad,1);
-												max_distinct_month = tmp.months;
-										}
-										else if(tmp.months==max_distinct_month&&in.get(jRoad)!=1)
-										{
-												maxM.add(jRoad);
-												in.put(jRoad,1);
-										}
-
-								}
-								else
-								{
+								String jRoad = GetRoadName(jloc);
+								if(jRoad==null)
 										continue;
+								Info tmp = info.get(jRoad);
+								if(tmp.months>max_distinct_month)
+								{
+										maxM.clear();
+										maxM.add(jRoad);
+										in.put(jRoad,1);
+										max_distinct_month = tmp.months;
 								}
+								else if(tmp.months==max_distinct_month&&in.get(jRoad)!=1)
+								{
+										maxM.add(jRoad);
+										in.put(jRoad,1);
+								}
+
 						}
 						for(int i = 0;i<maxM.size();i++)
 						{
 								Info tmp = info.get(maxM.get(i));
-								System.out.println(maxM.get(i)+" Max:"+tmp.maxprice+" Min:"+tmp.minprice);
+								System.out.println(maxM.get(i)+" 最高成交價:"+tmp.maxprice+" 最低成交價:"+tmp.minprice);
 						}
 
 
